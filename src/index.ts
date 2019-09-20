@@ -1,26 +1,25 @@
 import { ApolloServer } from "apollo-server-express";
 import express from "express";
 import "reflect-metadata";
+import { buildSchema } from "type-graphql";
+import { createConnections } from "typeorm";
+import { UserResolver } from "./UserResolver";
 
 (async () => {
   const app = express();
   app.get("/", (_req, res) => res.send("hello"));
+
+  await createConnections();
+
   const apolloServer = new ApolloServer({
-    typeDefs: `
-    type Query {
-      hello: String!
-    }
-    `,
-    resolvers: {
-      Query: {
-        hello: () => "Hello HEX"
-      }
-    }
+    schema: await buildSchema({
+      resolvers: [UserResolver]
+    })
   });
 
   apolloServer.applyMiddleware({ app });
   app.listen(4000, () => {
-    console.log("server runing at http://localhost:4000");
+    console.log("server runing at http://localhost:4000/graphql");
   });
 })();
 
