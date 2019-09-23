@@ -6,8 +6,9 @@ import { verify } from "jsonwebtoken";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { createConnections } from "typeorm";
-import { createAccessToken } from "./auth";
+import { createAccessToken, createRefreshToken } from "./auth";
 import { User } from "./entity/User";
+import { sendRefreshToken } from "./sendRefreshToken";
 import { UserResolver } from "./UserResolver";
 
 (async () => {
@@ -31,6 +32,10 @@ import { UserResolver } from "./UserResolver";
     if (!user) {
       return res.send({ ok: false, accessToken: "" });
     }
+    if (user.tokenVersion !== payload.tokenVersion) {
+      return res.send({ ok: false, accessToken: "" });
+    }
+    sendRefreshToken(res, createRefreshToken(user));
 
     return res.send({ ok: true, accessToken: createAccessToken(user) });
   });
