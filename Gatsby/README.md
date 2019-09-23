@@ -1,1 +1,0 @@
-## Hex Zero Gatsby Template
