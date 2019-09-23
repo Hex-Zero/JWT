@@ -2,6 +2,7 @@ import { compare, hash } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import {
   Arg,
+  Ctx,
   Field,
   Mutation,
   ObjectType,
@@ -9,6 +10,7 @@ import {
   Resolver
 } from "type-graphql";
 import { User } from "./entity/User";
+import { MyContext } from "./MyContext";
 
 @ObjectType()
 class LoginResponse {
@@ -31,7 +33,8 @@ export class UserResolver {
   @Mutation(() => LoginResponse)
   async login(
     @Arg("email") email: string,
-    @Arg("password") password: string
+    @Arg("password") password: string,
+    @Ctx() { res }: MyContext
   ): Promise<LoginResponse> {
     const user = await User.findOne({ where: { email } });
     if (!user) {
@@ -42,7 +45,13 @@ export class UserResolver {
       throw new Error("bad password");
     }
     // login successful
-
+    res.cookie(
+      "jid",
+      sign({ userId: user.id }, "hutonahueaou", {
+        expiresIn: "7d"
+      }),
+      { httpOnly: true }
+    );
     return {
       accessToken: sign({ userId: user.id }, "uthotuhouna", {
         expiresIn: "15m"
