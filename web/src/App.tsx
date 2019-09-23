@@ -1,7 +1,13 @@
 import React from "react";
+import { useHelloQuery } from "./generated/graphql";
 
 const App: React.FC = () => {
-  return <div>Hello</div>;
+  const { data, loading } = useHelloQuery();
+  if (loading || !data) {
+    return <div>Loading...</div>;
+  }
+
+  return <div>{data.hello}</div>;
 };
 
 export default App;
