@@ -1,5 +1,6 @@
 import { ApolloServer } from "apollo-server-express";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import "dotenv/config";
 import express from "express";
 import { verify } from "jsonwebtoken";
@@ -13,6 +14,12 @@ import { UserResolver } from "./UserResolver";
 
 (async () => {
   const app = express();
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true
+    })
+  );
   app.use(cookieParser());
   app.get("/", (_req, res) => res.send("hello"));
   app.post("/refresh_token", async (req, res) => {
@@ -48,7 +55,7 @@ import { UserResolver } from "./UserResolver";
     context: ({ req, res }) => ({ req, res })
   });
 
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
   app.listen(4000, () => {
     console.log("server runing at http://localhost:4000/graphql");
   });
