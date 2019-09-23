@@ -1,5 +1,4 @@
 import { compare, hash } from "bcryptjs";
-import { sign } from "jsonwebtoken";
 import {
   Arg,
   Ctx,
@@ -9,6 +8,7 @@ import {
   Query,
   Resolver
 } from "type-graphql";
+import { createAccessToken, createRefreshToken } from "./auth";
 import { User } from "./entity/User";
 import { MyContext } from "./MyContext";
 
@@ -45,17 +45,9 @@ export class UserResolver {
       throw new Error("bad password");
     }
     // login successful
-    res.cookie(
-      "jid",
-      sign({ userId: user.id }, "hutonahueaou", {
-        expiresIn: "7d"
-      }),
-      { httpOnly: true }
-    );
+    res.cookie("jid", createRefreshToken(user), { httpOnly: true });
     return {
-      accessToken: sign({ userId: user.id }, "uthotuhouna", {
-        expiresIn: "15m"
-      })
+      accessToken: createAccessToken(user)
     };
   }
 
