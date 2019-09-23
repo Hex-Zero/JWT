@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
+import { setAccessToken } from "../accessToken";
 import { useLoginMutation } from "../generated/graphql";
 
 const Login: React.FC<RouteComponentProps> = ({ history }) => {
@@ -19,6 +20,9 @@ const Login: React.FC<RouteComponentProps> = ({ history }) => {
           }
         });
         console.log(response);
+        if (response && response.data) {
+          setAccessToken(response.data.login.accessToken);
+        }
 
         history.push("/");
       }}
